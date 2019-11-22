@@ -1,0 +1,17 @@
+{
+  "name": "nitro-acceptor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index"
+  },
+  "author": "никита",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.0",
+    "winston": "^3.2.1"
+  }
+}
