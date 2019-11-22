@@ -7,7 +7,10 @@ const fetch = require("node-fetch");
 
 const logger = winston.createLogger({
   level: "info",
-  format: winston.format.json(),
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
   transports: [
     // - Write all logs to console.
     new winston.transports.Console(),
