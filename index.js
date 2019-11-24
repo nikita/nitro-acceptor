@@ -33,6 +33,30 @@ function matchCode(text, callback) {
   }
 }
 
+const logWithInfo = (isSuccess, message) => {
+  const logLevel = isSuccess === "success" ? "info" : "error";
+
+  if (message.channel.type === "text") {
+    // Message was sent in a guild
+    logger.log({
+      level: logLevel,
+      message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} : Sent by ${
+        message.author.username
+      }#${message.author.discriminator} Guild: ${
+        message.guild.name
+      } : Channel: ${message.channel.name} Type: ${message.channel.type}`
+    });
+  } else {
+    // Message was sent in a dm or group
+    logger.log({
+      level: logLevel,
+      message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} : Sent by ${
+        message.author.username
+      }#${message.author.discriminator} Type: ${message.channel.type}`
+    });
+  }
+};
+
 client.on("ready", () => {
   logger.info(`Ready to accept nitro gift as ${client.user.tag}`);
 });
@@ -86,12 +110,11 @@ client.on("message", message => {
     )
       .then(res => {
         if (res.status == 400 || res.status == 404) {
-          logger.error(`[ERROR] CODE INVALID`);
-          return;
+          logWithInfo("error", message);
         }
         res.json().then(json => {
           logger.debug(json);
-          logger.info(`[SUCCESS] CODE REDEEMED`);
+          logWithInfo("success", message);
         });
       })
       .catch(err => {
