@@ -3,7 +3,7 @@ require("dotenv").config();
 const discord = require("discord.js");
 const client = new discord.Client();
 const winston = require("winston");
-const fetch = require("node-fetch");
+const rp = require("request-promise");
 
 const logger = winston.createLogger({
   level: "info",
@@ -71,55 +71,41 @@ client.on("message", message => {
 
   if (codes.length == 0) return;
 
-  codes.forEach(code => {
-    fetch(
-      "https://discordapp.com/api/v6/entitlements/gift-codes/" +
-        code.split("/").pop() +
-        "/redeem",
-      {
-        method: "POST",
+  codes.forEach(async code => {
+    try {
+      const response = await rp.post({
+        uri:
+          "https://discordapp.com/api/v6/entitlements/gift-codes/" +
+          code.split("/").pop() +
+          "/redeem",
         headers: {
           Accept: "*/*",
           "Accept-Encoding": "gzip, deflate, br",
           "Accept-Language": "en-US",
           Authorization: client.token,
           Connection: "keep-alive",
-          "Content-Length": JSON.stringify({ channel_id: message.channel.id })
-            .length,
-          "Content-Type": "application/json",
-          Host: "discordapp.com",
           Referer: `Referer: https://discordapp.com/channels/${message.channel.id}/${message.id}`,
           "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/0.0.305 Chrome/69.0.3497.128 Electron/4.0.8 Safari/537.36",
-          "X-Super-Properties": Buffer.from(
-            JSON.stringify({
-              os: "Windows",
-              browser: "Discord Client",
-              release_channel: "stable",
-              client_version: "0.0.305",
-              os_version: "10.0.17134",
-              os_arch: "x64",
-              client_build_number: 41877,
-              client_event_source: null
-            }),
-            "utf-8"
-          ).toString("base64")
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
         },
-        body: JSON.stringify({ channel_id: message.channel.id })
-      }
-    )
-      .then(res => {
-        if (res.status == 400 || res.status == 404) {
-          logWithInfo("error", message);
-        }
-        res.json().then(json => {
-          logger.debug(json);
-          logWithInfo("success", message);
-        });
-      })
-      .catch(err => {
-        logger.error(err);
+        body: { channel_id: message.channel.id },
+        json: true,
+        resolveWithFullResponse: true
       });
+
+      logger.debug(response.body);
+      logWithInfo(true, message);
+    } catch (err) {
+      if (err.name === "StatusCodeError") {
+        if (err.response.statusCode == 400 || err.response.statusCode == 404) {
+          logWithInfo(false, message);
+        } else {
+          logger.error(err);
+        }
+      } else {
+        logger.error(err);
+      }
+    }
   });
 });
 
