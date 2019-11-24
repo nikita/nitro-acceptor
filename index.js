@@ -21,15 +21,15 @@ const logger = winston.createLogger({
   ]
 });
 
-function matchCode(text, callback) {
-  let codes = text.match(
-    /https:\/\/discord\.gift\/[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]+/
+function matchCodes(text) {
+  const codes = text.match(
+    /https:\/\/discord\.gift\/[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]+/g
   );
+
   if (codes) {
-    callback(codes[0]);
-    return matchCode(text.slice(codes.index + codes[0].length), callback);
+    return codes;
   } else {
-    callback(null);
+    return [];
   }
 }
 
@@ -51,13 +51,7 @@ client.on("ready", () => {
 });
 
 client.on("message", message => {
-  let codes = [];
-
-  matchCode(message.content, code => {
-    if (!code) return;
-    if (!codes.includes(code)) codes.push(code);
-  });
-
+  let codes = new Set(matchCodes(message.content));
   if (codes.length == 0) return;
 
   codes.forEach(async code => {
