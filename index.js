@@ -34,27 +34,16 @@ function matchCode(text, callback) {
 }
 
 const logWithInfo = (isSuccess, message) => {
-  const logLevel = isSuccess === "success" ? "info" : "error";
-
-  if (message.channel.type === "text") {
-    // Message was sent in a guild
-    logger.log({
-      level: logLevel,
-      message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} : Sent by ${
-        message.author.username
-      }#${message.author.discriminator} Guild: ${
-        message.guild.name
-      } : Channel: ${message.channel.name} Type: ${message.channel.type}`
-    });
-  } else {
-    // Message was sent in a dm or group
-    logger.log({
-      level: logLevel,
-      message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} : Sent by ${
-        message.author.username
-      }#${message.author.discriminator} Type: ${message.channel.type}`
-    });
-  }
+  logger.log({
+    level: isSuccess === "success" ? "info" : "error",
+    message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} - Sent by ${
+      message.author.username
+    }#${message.author.discriminator}${
+      message.channel.type === "text"
+        ? ` Guild: ${message.guild.name} Channel: ${message.channel.name}`
+        : ""
+    } Type: ${message.channel.type}`
+  });
 };
 
 client.on("ready", () => {
