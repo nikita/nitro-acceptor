@@ -50,6 +50,8 @@ client.on("ready", () => {
   logger.info(`Ready to accept nitro gift as ${client.user.tag}`);
 });
 
+client.on("error", err => logger.error(`Client: ${err}`));
+
 client.on("message", message => {
   const codes = new Set(matchCodes(message.content));
   if (codes.length == 0) return;
@@ -91,4 +93,6 @@ client.on("message", message => {
   });
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client
+  .login(process.env.DISCORD_TOKEN)
+  .catch(err => logger.error(`Login: ${err.message}`));
