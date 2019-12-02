@@ -35,7 +35,7 @@ const matchCodes = text => {
 
 const logWithInfo = (isSuccess, message) => {
   logger.log({
-    level: isSuccess === "success" ? "info" : "error",
+    level: isSuccess ? "info" : "error",
     message: `${isSuccess ? "Code Redeemed" : "Code Invalid"} - Sent by ${
       message.author.username
     }#${message.author.discriminator}${
