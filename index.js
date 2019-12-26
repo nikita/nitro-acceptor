@@ -58,6 +58,8 @@ client.on("message", message => {
 
   codes.forEach(async code => {
     try {
+      logger.info(`Trying with code ${code}`);
+
       const response = await rp.post({
         uri:
           "https://discordapp.com/api/v6/entitlements/gift-codes/" +
